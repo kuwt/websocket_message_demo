@@ -3,13 +3,15 @@ from flask_socketio import send, emit
 
 from app import socketapp
 from app import socketio
+import os
+import sys
 import time
 import threading
+import zmq
 
 @socketapp.route('/')
 @socketapp.route('/index')
 def index():
-    user = {'username': 'Miguel'}
     return render_template('index.html', title='Home', user="test1")
 
 @socketapp.route('/hello')
@@ -44,15 +46,48 @@ def test_connect():
 def test_disconnect():
     print('Client disconnected')
 
-######################################
-# background_calculation
-######################################
-def background_calculation():
-    i = 0
-    while True:
-        socketio.send("hallo " + str(i))
-        i = i+1
-        time.sleep(1)
 
-thread = threading.Thread(target=background_calculation)
-thread.start()
+
+
+######################################
+#MessageServer
+######################################
+class MessageServer:
+    def __init__(self, addr = 'tcp://127.0.0.1:6000', handler = None):
+        # connect to message server
+        self.context = zmq.Context()
+        self.socket = self.context.socket(zmq.REP)
+        self.socket.bind(addr)
+        self.msghandler = handler
+
+    def msgHandlerThread(self):
+        while True:
+            msg = self.socket.recv()
+            decode_msg = msg.decode("utf-8")
+            if self.msghandler != None:
+                self.msghandler(decode_msg)
+            self.socket.send_string("noted")
+
+    def start(self):
+        thread = threading.Thread(target=self.msgHandlerThread)
+        thread.start()
+
+
+def messageGenerator():
+    print("current directory = {}".format(os.getcwd()))
+    os.system('python3 ./app/messageGenerator.py')
+
+def msgHandler(msg):
+    socketio.send(msg)
+######################################
+# main
+w = MessageServer(addr = 'tcp://127.0.0.1:6000',handler = msgHandler)
+w.start()
+
+thread2 = threading.Thread(target=messageGenerator)
+thread2.start()
+
+
+
+
+
