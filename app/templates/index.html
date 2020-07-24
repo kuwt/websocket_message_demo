@@ -1,0 +1,34 @@
+<html>
+    <head>
+        <title>{{ title }} - Microblog</title>
+    </head>
+    <body>
+        <h1>Hello, {{ user.username }}!</h1>
+
+    <textarea id="t1" name="w3review" rows="4" cols="50"  readonly></textarea>
+
+    </body>
+
+    <script src="https://cdn.jsdelivr.net/npm/socket.io-client@2/dist/socket.io.js"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"> </script>
+    
+    <script src="/static/js/messageConsole.js"> </script>
+    
+    <script>
+    /********
+    socket io
+    **********/
+      var socket = io();
+      socket.on('connect', function ()  {
+          socket.emit('my event', { data: 'I\'m connected!' });
+      });
+
+      socket.on('message', function (message) {
+          appendLineToTextArea(message);
+      });
+
+      setActiveMessageConsole("#t1")
+      </script>
+       
+   
+</html>
