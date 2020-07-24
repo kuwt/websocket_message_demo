@@ -15,19 +15,16 @@
     <script src="/static/js/messageConsole.js"> </script>
     
     <script>
-    /********
-    socket io
-    **********/
       var socket = io();
       socket.on('connect', function ()  {
-          socket.emit('my event', { data: 'I\'m connected!' });
       });
 
       socket.on('message', function (message) {
-          appendLineToTextArea(message);
+          msgConsole.addLoggingLine(message);
       });
+    
+      msgConsole = new messageConsole("#t1", 10);
 
-      setActiveMessageConsole("#t1")
       </script>
        
    
