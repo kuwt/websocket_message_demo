@@ -10,7 +10,7 @@ import threading
 @socketapp.route('/index')
 def index():
     user = {'username': 'Miguel'}
-    return render_template('index.html', title='Home', user=user)
+    return render_template('index.html', title='Home', user="test1")
 
 @socketapp.route('/hello')
 def hello():
